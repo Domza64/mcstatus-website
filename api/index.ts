@@ -1,28 +1,9 @@
+import path from "path";
+
 const express = require("express");
-const path = require("path");
-const bodyParser = require("body-parser");
-const livereload = require("livereload");
-const connectLivereload = require("connect-livereload");
-require("dotenv").config();
-
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(bodyParser.json());
-app.use(connectLivereload());
 app.use(express.static(path.join(__dirname, "../public")));
-
-// Start the livereload server to watch public folder
-const liveReloadServer = livereload.createServer();
-liveReloadServer.watch(path.join(__dirname, "public"));
-
-// Notify browser of changes
-liveReloadServer.server.once("connection", () => {
-  setTimeout(() => {
-    liveReloadServer.refresh("/");
-  }, 100);
-});
 
 // TODO - MAKE SURE TO REMOVE SERVER HOST FROM RESPONSE, GOOD FOR NOW BUT IN FUTURE ONLY INCLUDE INFORMATION THAT IS DISPLAYED IN FRONTEND
 app.get("/api/serverStatus", (req, res) => {
@@ -54,6 +35,4 @@ app.get("/api/serverStatus", (req, res) => {
     });
 });
 
-app.listen(PORT, () =>
-  console.log(`Server running on http://localhost:${PORT}`)
-);
+module.exports = app;

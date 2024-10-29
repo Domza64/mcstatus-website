@@ -1,2 +1,3 @@
-# mcstatus-website
-Website for displaying status of my minecraft server
+# Domza's MC Server status website
+
+This is a website for displaying status and in future updates history of my MC server uptime and active players...
