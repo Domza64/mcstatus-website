@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/style.css" />
+    <title>Server Status</title>
+  </head>
+  <body class="aldrich-regular">
+    <section id="hero">
+      <h1>Domza's MC Server Status:</h1>
+
+      <!-- Loading Message -->
+      <div id="loading-message">Loading server status...</div>
+
+      <!-- Server Info (Initially Hidden) -->
+      <div id="server-info" style="display: none">
+        <p><strong>Server Name:</strong> <span id="server-name"></span></p>
+        <p><strong>Status:</strong> <span id="status"></span></p>
+        <p>
+          <strong>Players Online:</strong> <span id="players-online"></span> /
+          <span id="max-players"></span>
+        </p>
+        <div id="player-list-container" style="display: none">
+          <strong>Players:</strong>
+          <ul id="player-list"></ul>
+        </div>
+      </div>
+    </section>
+  </body>
+  <script>
+    function fetchData() {
+      // Show the loading message and hide server info initially
+      document.getElementById("loading-message").style.display = "block";
+      document.getElementById("server-info").style.display = "none";
+
+      fetch("/api/serverStatus")
+        .then((response) => response.json())
+        .then((data) => {
+          // Hide the loading message and show server info
+          document.getElementById("loading-message").style.display = "none";
+          document.getElementById("server-info").style.display = "block";
+
+          // Set server status
+          const status = data.online ? "Online" : "Down";
+          document.getElementById("status").innerText = status;
+          document.getElementById("status").style.color =
+            status === "Online" ? "green" : "red";
+
+          // Set server name and description (MOTD)
+          document.getElementById("server-name").innerText = data.motd.clean;
+
+          // Set players online and max players
+          document.getElementById("players-online").innerText =
+            data.players.online;
+          document.getElementById("max-players").innerText = data.players.max;
+
+          // Display list of players if any are online
+          const playerListContainer = document.getElementById(
+            "player-list-container"
+          );
+          const playerList = document.getElementById("player-list");
+          if (data.players.list.length > 0) {
+            playerListContainer.style.display = "block";
+            playerList.innerHTML = "";
+            data.players.list.forEach((player) => {
+              const listItem = document.createElement("li");
+              listItem.innerText = player.name_clean;
+              playerList.appendChild(listItem);
+            });
+          } else {
+            playerListContainer.style.display = "none";
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          document.getElementById("loading-message").innerText =
+            "Failed to load server data.";
+        });
+    }
+    fetchData();
+  </script>
+</html>
